@@ -17,7 +17,7 @@ from consolidated_tcx_to_motion_map_30 import (
 st.set_page_config(page_title="Motion Map", layout="wide")
 
 # --- UI HEADER ---
-st.title("🗺️ Motion Map Analyzer")
+st.title("👟📍📈 Motion Map Analyzer")
 
 st.markdown("""
 An interactive, web-based running data analytics application that parses standard **.tcx** fitness files, 
