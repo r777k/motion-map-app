@@ -2,7 +2,7 @@
 
 An interactive, web-based running data analytics platform built with Python, Streamlit, and Leaflet.js. This application parses standard `.tcx` fitness files, automatically smooths raw GPS/sensor noise, applies movement state classifications (running, walking, stopped), and renders a rich performance overlay directly onto a web map.
 
-👉 **Try the live app here:** [Replace with your Streamlit URL once live]
+👉 **Try the live app here:** https://motion-map-app.streamlit.app/
 
 ---
 
