@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from functools import lru_cache
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Photon
 
 from zoneinfo import ZoneInfo
 from timezonefinder import TimezoneFinder
@@ -1020,42 +1020,35 @@ def infer_activity_timezone_name(plot_df: pd.DataFrame) -> str:
 def reverse_geocode_city(lat: float, lon: float) -> str:
     """
     Reverse geocodes lat/lon to a city/town name.
-    Includes a highly specific user-agent and extended timeout for cloud deployments.
+    Uses Photon (Komoot) which is much more reliable on cloud servers than Nominatim.
     """
     if pd.isna(lat) or pd.isna(lon):
-        return ""
+        return "Unknown location"
         
     try:
-        # FIX 1: Unique User-Agent prevents OpenStreetMap from blocking the cloud IP
-        geolocator = Nominatim(user_agent="motion_map_analyzer_streamlit_v1.0")
-        
-        # FIX 2: Increased timeout to 10 seconds for slower cloud network routing
+        # Photon is highly cloud-friendly
+        geolocator = Photon(user_agent="motion_map_analyzer_v2")
         location = geolocator.reverse((lat, lon), exactly_one=True, timeout=10)
         
         if not location:
-            return ""
+            return "Unknown location"
             
-        address = location.raw.get("address", {})
+        # Photon stores the address data inside a 'properties' dictionary
+        address = location.raw.get("properties", {})
         
-        # OpenStreetMap stores city names inconsistently depending on the region's size
         city = (
             address.get("city") or 
             address.get("town") or 
-            address.get("municipality") or 
-            address.get("village") or 
-            address.get("suburb")
+            address.get("county") or 
+            address.get("district") or 
+            address.get("state")
         )
         
-        if city:
-            return city
-            
-        # Fallback to state/county if city is somehow completely missing
-        return address.get("state") or address.get("county") or ""
+        return city if city else "Unknown location"
         
     except Exception as e:
-        # Fails gracefully without crashing the app
         print(f"Geocoding Error: {e}")
-        return ""
+        return "Unknown location"
 
 
 def build_run_summary_title(runstats: dict, plot_df: pd.DataFrame) -> str:
