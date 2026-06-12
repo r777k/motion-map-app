@@ -18,7 +18,23 @@ st.set_page_config(page_title="Motion Map", layout="wide")
 
 # --- UI HEADER ---
 st.title("🗺️ Motion Map Analyzer")
-st.markdown("Upload your run data to generate an interactive performance map.")
+
+st.markdown("""
+An interactive, web-based running data analytics application that parses standard **.tcx** fitness files, 
+automatically smooths raw GPS/sensor noise, applies movement state classifications (running, walking, stopped), 
+and renders a rich performance overlay directly onto a web map.
+""")
+
+with st.expander("✨ Application Features", expanded=False):
+    st.markdown("""
+    * **Advanced Motion Segmentation:** Vectorized classification algorithms that divide your activity into highly precise Running, Walking, and Stopped segments.
+    * **Interactive Metric Overlays:** High-fidelity overlays for Pace, Heart Rate, and Cadence distributed seamlessly across map geometry.
+    * **Press-and-Hold Highlighting:** Smooth JavaScript-driven interactions enabling users to hold performance blocks (like Per-Km Splits or HR zones) to isolate exact route sections on the map.
+    * **Privacy Controls:** Optional on-the-fly privacy zones that trim the first and last 500 meters of your activity to mask sensitive start/end addresses.
+    * **Privacy-First Processing:** Secure architecture executing completely in RAM; user data is parsed in-memory and immediately destroyed post-session.
+    """)
+
+st.divider()
 
 # --- SIDEBAR CONTROLS ---
 with st.sidebar:
