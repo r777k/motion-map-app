@@ -42,7 +42,7 @@ with st.sidebar:
     # MVP Feature: Privacy Zones
     apply_privacy = st.checkbox(
         "Enable Privacy Zone", 
-        value=True, 
+        value=False, 
         help="Hides the first and last 500 meters of your route to protect home/start locations."
     )
     
