@@ -4,3 +4,4 @@ numpy
 geopy
 timezonefinder
 tzdata
+fitparse==1.2.0

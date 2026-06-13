@@ -4,6 +4,7 @@ import csv
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
+import fitparse
 
 import numpy as np
 import pandas as pd
@@ -14,8 +15,8 @@ from geopy.geocoders import Photon
 from zoneinfo import ZoneInfo
 from timezonefinder import TimezoneFinder
 
-import time  # <-- ADD THIS
-from contextlib import contextmanager  # <-- ADD THIS
+import time
+from contextlib import contextmanager
 
 NS = {
     "tcx": "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
@@ -121,6 +122,42 @@ def parse_tcx_to_rows(tcx_path: Path):
                     "watts": watts,
                 }
 
+def parse_fit_to_rows(fit_file_or_path):
+    """Parses binary .fit files into the same dictionary structure as TCX."""
+    fitfile = fitparse.FitFile(fit_file_or_path)
+    
+    for record in fitfile.get_messages("record"):
+        data = {}
+        for record_data in record:
+            data[record_data.name] = record_data.value
+            
+        # FIT coordinates are stored as semicircles. Convert to standard degrees.
+        lat = data.get("position_lat")
+        lon = data.get("position_long")
+        if lat is not None:
+            lat = lat * (180.0 / (2**31))
+        if lon is not None:
+            lon = lon * (180.0 / (2**31))
+            
+        timestamp = data.get("timestamp")
+        
+        yield {
+            "activity_id": None,
+            "sport": "Run",
+            "lap_start_time": None,
+            "lap_total_time_s": None,
+            "lap_distance_m": None,
+            "time": str(timestamp) if timestamp else None,
+            "latitude": lat,
+            "longitude": lon,
+            "altitude_m": data.get("altitude"),
+            "distance_m": data.get("distance"),
+            "heart_rate_bpm": data.get("heart_rate"),
+            "cadence": data.get("cadence"),
+            "speed_m_s": data.get("speed"),
+            "run_cadence": data.get("cadence"),
+            "watts": data.get("power"),
+        }
 
 def write_csv(rows, out_path: Path):
     rows = list(rows)

@@ -6,7 +6,7 @@ import traceback
 
 # Import your core engine functions here
 from consolidated_tcx_to_motion_map_30 import (
-    parse_tcx_to_rows, prepare_run_df, add_deltas, add_smoothed_speed,
+    parse_tcx_to_rows, parse_fit_to_rows, prepare_run_df, add_deltas, add_smoothed_speed,
     summarize_motion_segments, prepare_for_csv, infer_activity_timezone_name,
     compute_performance_stats, collapse_run_streams_for_map, build_lookup,
     enrich_segments, build_segments_payload, compute_metric_stats,
@@ -20,7 +20,7 @@ st.set_page_config(page_title="Motion Map", layout="wide")
 st.title("👟📍📈 Motion Map Analyzer")
 
 st.markdown("""
-An interactive, web-based running data analytics application that parses standard **.tcx** fitness files, 
+An interactive, web-based running data analytics application that parses standard **.tcx** and **.fit** fitness files, 
 automatically smooths raw GPS/sensor noise, applies movement state classifications (running, walking, stopped), 
 and renders a rich performance overlay directly onto a web map.
 """)
@@ -29,9 +29,9 @@ with st.expander("✨ Application Features", expanded=False):
     st.markdown("""
     * **Advanced Motion Segmentation:** Vectorized classification algorithms that divide your activity into highly precise Running, Walking, and Stopped segments.
     * **Interactive Metric Overlays:** High-fidelity overlays for Pace, Heart Rate, and Cadence distributed seamlessly across map geometry.
-    * **Press-and-Hold Highlighting:** Smooth JavaScript-driven interactions enabling users to hold performance blocks (like Per-Km Splits or HR zones) to isolate exact route sections on the map.
+    * **Press-and-Hold Highlighting:** Smooth interactions enabling users to hold performance blocks (like Per-Km Splits or HR zones) to isolate exact route sections on the map.
     * **Privacy Controls:** Optional on-the-fly privacy zones that trim the first and last 500 meters of your activity to mask sensitive start/end addresses.
-    * **Privacy-First Processing:** Secure architecture executing completely in RAM; user data is parsed in-memory and immediately destroyed post-session.
+    * **Privacy-First Processing:** Secure architecture executing completely in RAM; all user data and analysis are processed in-memory and immediately destroyed post-session; zero user data retention.
     """)
 
 st.divider()
@@ -54,7 +54,7 @@ with st.sidebar:
 
 # --- FILE UPLOADER ---
 # Streamlit holds this file entirely in RAM
-uploaded_file = st.file_uploader("Upload a .tcx file", type=["tcx"])
+uploaded_file = st.file_uploader("Upload a .tcx or .fit file", type=["tcx", "fit"]) # <-- Added "fit"
 
 # --- PROCESSING PIPELINE ---
 file_to_process = None
@@ -74,7 +74,12 @@ if file_to_process:
     with st.spinner("Analyzing your activity... This usually takes 5-10 seconds."):
         try:
             # 1. Parse in-memory TCX directly to a Pandas DataFrame
-            rows = list(parse_tcx_to_rows(file_to_process))
+            # Route the file to the correct parser based on its name
+            filename = file_to_process.name.lower()
+            if filename.endswith(".fit"):
+                rows = list(parse_fit_to_rows(file_to_process))
+            else:
+                rows = list(parse_tcx_to_rows(file_to_process))
             raw_run_df = pd.DataFrame(rows)
             
             if raw_run_df.empty:
