@@ -42,7 +42,7 @@ with st.sidebar:
     # MVP Feature: Privacy Zones
     apply_privacy = st.checkbox(
         "Enable Privacy Zone", 
-        value=False, 
+        value=True, 
         help="Hides the first and last 500 meters of your route to protect home/start locations."
     )
     
@@ -51,6 +51,17 @@ with st.sidebar:
     # MVP Feature: Demo Mode
     st.subheader("Don't have a file?")
     load_demo = st.button("Load Demo Run")
+
+    st.divider()
+    
+    # Data Disclaimer
+    st.caption("ℹ️ **Data Notice:** Motion segmentation and metrics are estimations. Final map geometry and statistics may differ slightly from your native tracker due to GPS drift and algorithm smoothing.")
+
+    # MVP Feature: Demo Mode
+    st.subheader("Don't have a file?")
+    load_demo = st.button("Load Demo Run")
+
+
 
 # --- FILE UPLOADER ---
 # Streamlit holds this file entirely in RAM

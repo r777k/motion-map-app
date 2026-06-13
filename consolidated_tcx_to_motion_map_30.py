@@ -2218,7 +2218,9 @@ h2 {{
     </section>
 
     <section class="panel-block footer">
-      Generated from TCX-derived motion segments.
+      Generated from device-derived TCX & FIT motion segments.
+      <br><br>
+      <i style="opacity: 0.85;">Disclaimer: Analytics and map alignments are algorithmic estimations based on raw device data. Environmental GPS drift, hardware sensor latency, and data smoothing may cause slight variations from absolute real-world performance.</i>
     </section>
   </aside>
 
